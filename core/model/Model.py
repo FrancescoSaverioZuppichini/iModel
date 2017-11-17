@@ -24,7 +24,7 @@ class Model(Buildable, Runnable):
         return self.optimizer(self.learning_rage).minimize(self.loss)
 
     def build_layers(self, x):
-        
+
         output = x
 
         for layer in self.layers:
