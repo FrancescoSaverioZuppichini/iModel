@@ -8,7 +8,7 @@ class Dense(Layer.Layer):
         self.shape = [size]
         self.activation = activation
 
-    def build(self, x, n_input):
+    def build(self, x, n_input, cost="output"):
 
         self.shape = [n_input, self.shape[-1]]
 
@@ -18,5 +18,13 @@ class Dense(Layer.Layer):
         self.raw =  tf.matmul(x, W) + b
         self.output = self.activation(self.raw)
 
-        return self.output
+
+        n_next_input = self.shape[-1]
+
+        outputs = {
+            'raw': self.raw,
+            'output': self.output
+        }
+
+        return outputs, n_next_input
 

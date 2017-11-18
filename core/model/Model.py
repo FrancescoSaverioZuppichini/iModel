@@ -4,9 +4,10 @@ import tensorflow as tf
 
 class Model(Buildable, Runnable):
 
-    def __init__(self, loss, optimizer=tf.train.AdamOptimizer, learning_rage=0.01):
+    def __init__(self, loss, optimizer=tf.train.AdamOptimizer, cost="output",learning_rage=0.01):
         self.layers = []
         self.loss = loss
+        self.cost = cost
         self.optimizer = optimizer
         self.learning_rage = learning_rage
 
@@ -25,24 +26,24 @@ class Model(Buildable, Runnable):
 
     def build_layers(self, x):
 
-        output = x
+        outputs = { 'output': x }
+        n_input = x.get_shape().as_list()[-1]
 
         for layer in self.layers:
-            n_input = output.get_shape().as_list()[-1]
-            output = layer.build(output, n_input=n_input)
+            outputs, n_input = layer.build(outputs["output"], n_input)
 
-        return output
+        return outputs
 
     def build(self, x, y):
 
-        self.output = self.build_layers(x)
+        self.outputs = self.build_layers(x)
 
-        self.loss = self.loss(self.output, y)
+        self.loss = self.loss(self.outputs[self.cost], y)
 
         self.train_step = self.create_train_step()
 
         # return them for convenience
-        return self.train_step, self.output, self.loss
+        return self.train_step, self.outputs['output'], self.loss
 
     def run(self, sess, feed_dict):
 

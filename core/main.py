@@ -2,6 +2,8 @@ import tensorflow as tf
 import numpy as np
 
 from core.layer import Dense
+from core.layer import LSTM
+
 from core.model import NeuralNetwork
 
 def twospirals(n_points=120, noise=1.6, twist=420):
@@ -25,17 +27,15 @@ X, T = X[:200], T[:200]
 x = tf.placeholder(tf.float32, [None,2], name='x')
 y = tf.placeholder(tf.float32, [None,1], name='y')
 
-net  = NeuralNetwork.NeuralNetwork()
+net  = NeuralNetwork.NeuralNetwork(learning_rage=0.01)
 net.add_layer(Dense.Dense(size=20, activation=tf.nn.relu))
 net.add_layer(Dense.Dense(size=10, activation=tf.nn.relu))
 net.add_layer(Dense.Dense(size=1, activation=tf.nn.tanh))
 output = net.build(x,y)
 
-print(net)
-
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    for _ in range(200):
+    for _ in range(300):
         loss, _ = net.run(sess, feed_dict={'x:0': X, 'y:0':T})
         loss_val = sess.run([net.loss], feed_dict={'x:0': X_val, 'y:0': T_val})
         print(loss, loss_val[0])
