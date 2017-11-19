@@ -37,3 +37,8 @@ with tf.Session() as sess:
         loss_val = sess.run([net.loss], feed_dict={'x:0': X_val, 'y:0': T_val})
         print(loss, loss_val[0])
 ```
+TODO:
+
+- LSTM
+- CNN
+- RNN 
