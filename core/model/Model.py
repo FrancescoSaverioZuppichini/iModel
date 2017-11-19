@@ -6,12 +6,17 @@ class Model(Buildable, Runnable):
 
     def __init__(self, loss, optimizer=tf.train.AdamOptimizer, cost="output",learning_rage=0.01):
         self.layers = []
+        self.names = {}
         self.loss = loss
         self.cost = cost
         self.optimizer = optimizer
         self.learning_rage = learning_rage
 
     def add_layer(self, layer, activation=tf.nn.relu):
+        has_name = layer.name != None
+
+        if(has_name):
+            self.names[layer.name] = layer
 
         self.layers.append(layer)
 

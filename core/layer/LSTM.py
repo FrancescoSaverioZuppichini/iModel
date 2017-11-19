@@ -5,21 +5,20 @@ from tensorflow.contrib import rnn
 
 class LSTM(Layer.Layer):
 
-    def __init__(self, size):
+    def __init__(self, size, name="lstm", cell=rnn.LSTMCell):
+        super().__init__(name)
         self.size = size
+        self.cell = cell
 
-    def build(self, x, n_input, cell=rnn.LSTMCell, *args, **kwargs):
-        input_shape = x.get_shape().as_list()
+    def build(self, x, n_input, *args, **kwargs):
 
-        cells = [cell(size) for size in self.size]
+        cells = [self.cell(size) for size in self.size]
         cells = [rnn.DropoutWrapper(cell, **kwargs) for cell in cells]
         cells = rnn.MultiRNNCell(cells, state_is_tuple=True)
 
         self.initial_state = cells.zero_state(tf.shape(x)[0], dtype=tf.float32)
 
-        raw_output, state = tf.nn.dynamic_rnn(cells, x, initial_state=self.initial_state ,dtype=tf.float32)
-
-        self.state = state
+        raw_output, self.state = tf.nn.dynamic_rnn(cells, x, initial_state=self.initial_state ,dtype=tf.float32)
 
         output = tf.reshape(raw_output, [-1, self.size[-1]])
 

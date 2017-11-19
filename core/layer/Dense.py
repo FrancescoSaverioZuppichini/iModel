@@ -4,7 +4,8 @@ import tensorflow as tf
 
 class Dense(Layer.Layer):
 
-    def __init__(self, size, activation):
+    def __init__(self, size, activation, *args, **kwargs):
+        super().__init__( *args, **kwargs)
         self.shape = [size]
         self.activation = activation
 

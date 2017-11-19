@@ -2,4 +2,5 @@ from abc import ABC, abstractmethod
 from core.protocols import  Buildable
 
 class Layer(Buildable):
-    pass
+    def __init__(self, name=None):
+        self.name = name
