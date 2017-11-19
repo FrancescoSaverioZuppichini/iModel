@@ -16,16 +16,14 @@ class Dense(Layer.Layer):
         W = tf.Variable(tf.truncated_normal(self.shape, stddev=0.1), name='{}-W'.format(self.name))
         b = tf.Variable(tf.zeros([self.shape[-1]]), name='{}-b'.format(self.name))
 
-        self.raw =  tf.matmul(x, W) + b
+        self.raw_output =  tf.matmul(x, W) + b
         self.output = self.activation(self.raw)
 
-
-        n_next_input = self.shape[-1]
-
         outputs = {
-            'raw': self.raw,
-            'output': self.output
+            'raw': self.raw_output,
+            'output': self.output,
+            'next_size': self.shape[-1]
         }
 
-        return outputs, n_next_input
+        return outputs
 
