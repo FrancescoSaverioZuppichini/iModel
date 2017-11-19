@@ -13,8 +13,8 @@ class Dense(Layer.Layer):
 
         self.shape = [n_input, self.shape[-1]]
 
-        W = tf.Variable(tf.truncated_normal(self.shape, stddev=0.1), name='W')
-        b = tf.Variable(tf.zeros([self.shape[-1]]), name='b')
+        W = tf.Variable(tf.truncated_normal(self.shape, stddev=0.1), name='{}-W'.format(self.name))
+        b = tf.Variable(tf.zeros([self.shape[-1]]), name='{}-b'.format(self.name))
 
         self.raw =  tf.matmul(x, W) + b
         self.output = self.activation(self.raw)

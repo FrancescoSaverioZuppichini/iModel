@@ -4,7 +4,7 @@ import tensorflow as tf
 
 class Model(Buildable, Runnable):
 
-    def __init__(self, loss, optimizer=tf.train.AdamOptimizer, cost="output",learning_rage=0.01):
+    def __init__(self, loss, optimizer=tf.train.AdamOptimizer, cost="output",learning_rage=0.001):
         self.layers = []
         self.names = {}
         self.loss = loss
@@ -14,9 +14,11 @@ class Model(Buildable, Runnable):
 
     def add_layer(self, layer, activation=tf.nn.relu):
         has_name = layer.name != None
+        # if name is not provided, its index is instead
+        if( not has_name):
+            layer.name = len(self.layers)
 
-        if(has_name):
-            self.names[layer.name] = layer
+        self.names[layer.name] = layer
 
         self.layers.append(layer)
 
@@ -32,6 +34,7 @@ class Model(Buildable, Runnable):
     def build_layers(self, x):
 
         outputs = { 'output': x }
+
         n_input = x.get_shape().as_list()[-1]
 
         for layer in self.layers:
@@ -65,7 +68,7 @@ class Model(Buildable, Runnable):
         model_str += str(self.layers[0].shape[0])
 
         for layer in self.layers:
-            model_str += " -> " +  str(layer.shape[1])
+            model_str += " -> " +  str(layer.shape)
 
         model_str += " -> y"
 
