@@ -134,7 +134,7 @@ class RNN:
 
     def generate(self, input_val, sess, interactive=False, n_text=100):
         """
-        Genere text from a input
+        Generate text from a input
         :param input_val: The initial start text
         :param sess: The current tf session
         :param interactive: If True, it will print while generating

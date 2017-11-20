@@ -4,7 +4,7 @@ import tensorflow as tf
 
 class Dense(Layer.Layer):
 
-    def __init__(self, size, activation, *args, **kwargs):
+    def __init__(self, size, activation=None, *args, **kwargs):
         super().__init__( *args, **kwargs)
         self.shape = [size]
         self.activation = activation
@@ -17,7 +17,10 @@ class Dense(Layer.Layer):
         b = tf.Variable(tf.zeros([self.shape[-1]]), name='{}-b'.format(self.name))
 
         self.raw_output =  tf.matmul(x, W) + b
-        self.output = self.activation(self.raw_output)
+        self.output = self.raw_output
+
+        if(self.activation):
+            self.output = self.activation(self.raw_output)
 
         outputs = {
             'raw': self.raw_output,

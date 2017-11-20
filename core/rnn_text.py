@@ -20,6 +20,7 @@ my_reader.load(DATA_URL)
 iter = my_reader.create_iter(nb_epochs=5)
 
 n_classes = 255
+n_batches = len(my_reader.data) // (batch_size * sequence_len)
 
 x = tf.placeholder(tf.int64, [None, None], name='x')
 y = tf.placeholder(tf.int64, [None, None], name='y')
@@ -48,18 +49,6 @@ def flat_output(x, n_input, prev_layer):
                 'next_size': prev_layer.shape[-1] }
 
     return outputs
-
-rnn  = Model(learning_rage=0.01, loss=get_loss, cost="raw")
-rnn.add_layer(LSTM(size=[128], dropout=dropout))
-# the output of the LSTM must be reshaped from 3D to 2D
-rnn.add_layer(Modifier(handler=flat_output))
-rnn.add_layer(Dense(size=n_classes, activation=tf.nn.softmax))
-rnn.build(x,y)
-
-# LSTM is automatically named 'lstm'
-state = rnn.names['lstm'].state
-initial_state = rnn.names['lstm'].initial_state
-print(rnn)
 
 def sample_prob_picker_from_best(distribution, n=2):
     p = np.squeeze(distribution)
@@ -92,11 +81,23 @@ def generate_text(input_val, n_text=100):
 
         x_batch = np.array([next])
 
+rnn  = Model(learning_rage=0.01, loss=get_loss, cost="raw")
+rnn.add_layer(LSTM(size=[128], dropout=dropout))
+# the output of the LSTM must be reshaped from 3D to 2D
+rnn.add_layer(Modifier(handler=flat_output))
+rnn.add_layer(Dense(size=n_classes, activation=tf.nn.softmax))
+rnn.build(x,y)
 
+# LSTM is automatically named 'lstm'
+state = rnn.names['lstm'].state
+initial_state = rnn.names['lstm'].initial_state
 
 last_state = None
 
+n = 0
+
 with tf.Session() as sess:
+
     sess.run(tf.global_variables_initializer())
 
     for x_batch, y_batch, epoch in iter:
@@ -109,6 +110,12 @@ with tf.Session() as sess:
         last_state = sess.run(state, feed_dict=feed_dict)
 
         feed_dict[initial_state] = last_state
+
+        n += 1
+
+        if(n % n_batches == 0 and n > 0):
+            # re initialise the state
+            last_state = None
 
         print(sess.run(tf.reduce_mean(loss)),epoch)
 
