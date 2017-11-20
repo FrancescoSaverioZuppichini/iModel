@@ -3,6 +3,8 @@ import numpy as np
 
 from core.layer.Dense import Dense
 from core.layer.LSTM import LSTM
+from core.layer.Modifier import Modifier
+
 
 from core.model import NeuralNetwork
 from core.model.Model import Model
@@ -15,7 +17,7 @@ sequence_len = 100
 
 my_reader = Reader.Reader(batch_size=batch_size, sequence_len=sequence_len)
 my_reader.load(DATA_URL)
-iter = my_reader.create_iter(nb_epochs=20)
+iter = my_reader.create_iter(nb_epochs=5)
 
 n_classes = 255
 
@@ -27,6 +29,7 @@ y = tf.one_hot(y, depth=n_classes, name='Y_hot')
 
 
 def get_loss(logits, y):
+
     shape = y.get_shape().as_list()
 
     y_flat = tf.reshape(y, [-1, shape[-1]])
@@ -38,14 +41,26 @@ def get_loss(logits, y):
 
 dropout = tf.placeholder(tf.float32, name='dropout')
 
-LSTM_block  = LSTM(size=[128], dropout=dropout)
+
+def flat_output(x, n_input, prev_layer):
+
+    outputs = { 'output': tf.reshape(x, [-1, prev_layer.shape[-1]]),
+                'next_size': prev_layer.shape[-1] }
+
+    return outputs
 
 rnn  = Model(learning_rage=0.01, loss=get_loss, cost="raw")
-rnn.add_layer(LSTM_block)
+rnn.add_layer(LSTM(size=[128], dropout=dropout))
+# the output of the LSTM must be reshaped from 3D to 2D
+rnn.add_layer(Modifier(handler=flat_output))
 rnn.add_layer(Dense(size=n_classes, activation=tf.nn.softmax))
 rnn.build(x,y)
 
+# LSTM is automatically named 'lstm'
+state = rnn.names['lstm'].state
+initial_state = rnn.names['lstm'].initial_state
 print(rnn)
+
 def sample_prob_picker_from_best(distribution, n=2):
     p = np.squeeze(distribution)
     p[np.argsort(p)[:-n]] = 0
@@ -64,9 +79,9 @@ def generate_text(input_val, n_text=100):
         feed_dict = {'x:0': x_batch, dropout: 1.0}
 
         if (last_state != None):
-            feed_dict[LSTM_block.initial_state] = last_state
+            feed_dict[initial_state] = last_state
 
-        preds, last_state = sess.run([rnn.outputs['output'], LSTM_block.state], feed_dict=feed_dict)
+        preds, last_state = sess.run([rnn.outputs['output'], state], feed_dict=feed_dict)
         preds = np.array([preds[-1]])
 
         next = sample_prob_picker_from_best(preds)
@@ -76,6 +91,8 @@ def generate_text(input_val, n_text=100):
         text += "".join(chr(next[0]))
 
         x_batch = np.array([next])
+
+
 
 last_state = None
 
@@ -89,9 +106,9 @@ with tf.Session() as sess:
         loss, _ = rnn.run(sess, feed_dict=feed_dict)
         # loss_val = sess.run(rnn.loss, feed_dict={'x:0': my_reader.val_data['X'], 'y:0':  my_reader.val_data['Y']})
 
-        last_state = sess.run(LSTM_block.state, feed_dict=feed_dict)
+        last_state = sess.run(state, feed_dict=feed_dict)
 
-        feed_dict[LSTM_block.initial_state] = last_state
+        feed_dict[initial_state] = last_state
 
         print(sess.run(tf.reduce_mean(loss)),epoch)
 

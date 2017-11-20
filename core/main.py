@@ -1,10 +1,10 @@
 import tensorflow as tf
 import numpy as np
 
-from core.layer import Dense
+from core.layer.Dense import Dense
 from core.layer import LSTM
-
-from core.model import NeuralNetwork
+from core.model.Model  import Model
+from core.model.NeuralNetwork import NeuralNetwork
 
 def twospirals(n_points=120, noise=1.6, twist=420):
     """
@@ -27,10 +27,10 @@ X, T = X[:200], T[:200]
 x = tf.placeholder(tf.float32, [None,2], name='x')
 y = tf.placeholder(tf.float32, [None,1], name='y')
 
-net  = NeuralNetwork.NeuralNetwork(learning_rage=0.01)
-net.add_layer(Dense.Dense(size=20, activation=tf.nn.relu))
-net.add_layer(Dense.Dense(size=10, activation=tf.nn.relu))
-net.add_layer(Dense.Dense(size=1, activation=tf.nn.tanh))
+net  = Model(learning_rage=0.01, loss=tf.losses.mean_squared_error)
+net.add_layer(Dense(size=20, activation=tf.nn.relu))
+net.add_layer(Dense(size=10, activation=tf.nn.relu))
+net.add_layer(Dense(size=1, activation=tf.nn.tanh))
 output = net.build(x,y)
 
 with tf.Session() as sess:

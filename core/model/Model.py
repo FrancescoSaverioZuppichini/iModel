@@ -47,11 +47,15 @@ class Model(Buildable, Runnable):
         :return: The last layer outputs
         """
         outputs = { "output" : x, "next_size": x.get_shape().as_list()[-1] }
-
+        i = 0
+        prev_layer = None
         for layer in self.layers:
             # the next size must be specified layer-side
             # in order to give more control about the inner structure
-            outputs = layer.build(outputs["output"], outputs["next_size"])
+            if(i > 0):
+                prev_layer = self.layers[i - 1]
+            outputs = layer.build(outputs["output"], outputs["next_size"], prev_layer=prev_layer)
+            i += 1
 
         return outputs
 
@@ -72,7 +76,7 @@ class Model(Buildable, Runnable):
         return self.train_step, self.outputs['output'], self.loss
 
     def run(self, sess, feed_dict):
-        
+
         current_loss = sess.run([ self.loss, self.train_step ], feed_dict=feed_dict)
 
         return current_loss

@@ -19,7 +19,7 @@ class LSTM(Layer):
         self.cell = cell
         self.dropout = dropout
 
-    def build(self, x, n_input, *args, **kwargs):
+    def build(self, x, n_input, prev_layer, *args, **kwargs):
 
         cells = [self.cell(size) for size in self.shape]
 
@@ -32,11 +32,11 @@ class LSTM(Layer):
 
         self.raw_output, self.state = tf.nn.dynamic_rnn(cells, x, initial_state=self.initial_state ,dtype=tf.float32)
 
-        self.output = tf.reshape(self.raw_output, [-1, self.shape[-1]])
+        # self.output = tf.reshape(self.raw_output, [-1, self.shape[-1]])
 
         outputs = {
             'raw': self.raw_output,
-            'output': self.output,
+            'output': self.raw_output,
             'next_size': self.shape[-1]
         }
 

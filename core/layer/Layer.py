@@ -10,4 +10,5 @@ class Layer(Buildable):
         :param name: A string that identifies the layer
         """
         self.name = name
+        self.shape = []
 
