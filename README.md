@@ -1,13 +1,27 @@
-# iModel
-### Low Level expressive API for tensorflow
+# tfLego
+### Low Level Expressive API for tensorflow
 by Francesco Saverio Zuppichini
 
+Similar to [lego](https://www.lego.com/en-us/), this framework aims to produce a easy and fast way to build models while giving the ability to the client to still deeply customise its implementation.
 ### Quick Start
 
 TODO
 
 docs here (TODO)
 
+### Introduction
+
+Nowadays lots of high level frameworks for TensorFlow exist, like Keras or tfLean. They provide a fast and scalable way to create machine learning model and train them, but, on the other hand, the client can not use most of the TensorFlow APIs and have to trust the custom made implementation from the framework provider that, in most of the cases, reinvende the wheels. With tfLego, only TensorFLows API are used.
+
+Most of the time, the library explicit ask the client to provide an instance from TensorFlow. Let's see how to create a model:
+
+```
+net  = Model(optimizer=tf.train.AdamOptimizer(0.05), loss=tf.losses.mean_squared_error)
+
+``` 
+tfLego asks for an `optimizer` and a `loss` function that must be from TensorFlow, nothing more nothing less.
+
+CONTINUE -> TODO
 ### Example
 
 #### Feedforward Network
