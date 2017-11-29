@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-
 class Buildable(ABC):
     """
     Classes that is conform to Buildable must implement the run
@@ -24,9 +23,9 @@ class Runnable(ABC):
 class Trainable(ABC):
     """
     Classes that is conform to Trainable must implement the train
-    method in order to provide to the client a way to train the model
+    method in order to provide the client a way to train the model.
     """
 
     @abstractmethod
-    def train(self, epochs, *args, **kwargs):
+    def train(self, sess, train_set, epochs,val_set=None, *args, **kwargs):
         pass
